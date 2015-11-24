@@ -1,0 +1,47 @@
+class: Workflow
+inputs:
+  - id: winp1
+  - id: winp2
+outputs:
+  - id: wout1
+    source: step3.out
+  - id: wout2
+    source: [step1.out, step2.out]
+steps:
+  - id: step1
+    inputs:
+      - id: step1.inp
+        source: winp1
+    outputs:
+      - id: step1.out
+    run:
+      class: CommandLineTool
+      inputs:
+        - id: inp
+      outputs:
+        - id: out
+  - id: step2
+    inputs:
+      - id: step2.inp
+        source: winp2
+    outputs:
+      - id: step2.out
+    run:
+      class: CommandLineTool
+      inputs:
+        - id: inp
+      outputs:
+        - id: out
+  - id: step3
+    inputs:
+      - id: step3.inp
+        source: [step1.out, step2.out]
+    outputs:
+      - id: step3.out
+    run:
+      class: CommandLineTool
+      inputs:
+        - id: inp
+      outputs:
+        - id: out
+
