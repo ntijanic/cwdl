@@ -1,6 +1,7 @@
 import os
 from cwdl.cwl.parser import load
 from cwdl.engine import Engine
+from cwdl.bindings import Job
 
 
 def load_cwl(name):
@@ -13,10 +14,10 @@ def test_cwl_wf():
     inputs = {
         'input': {'class': 'File', 'path': 'README.md'},
     }
-    job = engine.submit(wf, inputs)
+    job = engine.submit(wf, inputs, 'test')
     engine.run_all()
-    job = engine.get(job.id)
-    assert job.outputs['output']['path'].endswith('output.txt')
+    assert engine.get(job.id).state == Job.FINISHED
+    assert engine.jobs.vars['test.output']['path'].endswith('output.txt')
 
 
 if __name__ == '__main__':

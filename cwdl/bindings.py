@@ -49,15 +49,12 @@ class Job(object):
     TERMINATED = FAILED, FINISHED, ABORTED
     NON_TERMINATED = PENDING, READY, ACTIVE
 
-    def __init__(self, job_id, process, inputs=None, options=None, step_id=None, parent_id=None):
+    def __init__(self, job_id, process, step_id=None, parent_id=None):
         self.id = job_id
         self.process = process
-        self.inputs = inputs
-        self.options = options
         self.step_id = step_id
         self.parent_id = parent_id
-        self.outputs = None
         self.state = Job.PENDING
 
     def __repr__(self):
-        return 'Job[%s, %s, %s]' % (self.id, self.process.__class__, self.state)
+        return 'Job[%s %s %s]' % (self.state, self.process.__class__.__name__, self.id)

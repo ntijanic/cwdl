@@ -6,8 +6,11 @@ class JobStore(object):
         self.jobs = {}
         self.vars = {}
 
-    def add_or_update(self, job):
+    def add(self, job):
         self.jobs[job.id] = job
+
+    def set_state(self, job_id, state):
+        self.jobs[job_id].state = state
 
     def get(self, job_id):
         return self.jobs.get(job_id)
