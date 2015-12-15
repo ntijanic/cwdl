@@ -1,8 +1,3 @@
-class Port(object):
-    def __init__(self):
-        self.val = None
-
-
 class Process(object):
     def __init__(self):
         self.inputs = {}

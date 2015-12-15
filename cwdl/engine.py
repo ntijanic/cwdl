@@ -110,7 +110,7 @@ class Engine(object):
     def value_for_port(self, wf_job, port_id):
         links = sorted(wf_job.process.incoming_links(port_id), key=lambda x: x.pos)
         if not links:
-            return wf_job.process.ports[port_id].val
+            return wf_job.process.inputs.get(port_id)
         ids = [global_id(wf_job.id, l.src, l.src_step_id) for l in links]
         val = [self.jobs.vars[k] for k in ids]
         return val if len(val) > 1 else val[0]

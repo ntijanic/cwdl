@@ -26,18 +26,11 @@ def new_process(obj):
     raise NotImplementedError('Process type %s unknown' % cls)
 
 
-class Port(base.Port):
-    def __init__(self, port_id, type_def=None, val=None):
-        self.id = port_id
-        self.type_def = type_def
-        self.val = val
-
-
 class Process(base.Process):
     def __init__(self, obj):
         self.obj = obj
-        self.inputs = {i['id']: Port(i['id'], i.get('type')) for i in obj.get('inputs', [])}
-        self.outputs = {o['id']: Port(o['id'], o.get('type')) for o in obj.get('outputs', [])}
+        self.inputs = {i['id']: None for i in obj.get('inputs', [])}
+        self.outputs = {o['id']: None for o in obj.get('outputs', [])}
 
 
 class Step(base.Step):
@@ -69,19 +62,14 @@ class CLITool(Process, base.CLITool):
 class Workflow(Process, base.Workflow):
     def __init__(self, obj):
         super(Workflow, self).__init__(obj)
-        self.ports = {}
         self.steps = {}
         self.links = []
-        self.ports.update(self.inputs)
-        self.ports.update(self.outputs)
         for s in obj.get('steps', []):
-            inputs = {i['id']: Port(i['id'], i.get('type'), i.get('defaultValue')) for i in s.get('inputs', [])}
-            outputs = {o['id']: Port(o['id'], o.get('type')) for o in s.get('outputs', [])}
+            inputs = {i['id']: i.get('default') for i in s.get('inputs', [])}
+            outputs = {o['id']: None for o in s.get('outputs', [])}
             step_cls = MapStep if s.get('scatter') else Step
             step = step_cls(s['id'], inputs, outputs, new_process(s['run']))
             self.steps[step.id] = step
-            self.ports.update(inputs)
-            self.ports.update(outputs)
         # Create DataLinks
         for s in self.obj.get('steps', []):
             for i in s.get('inputs', []):
@@ -91,7 +79,7 @@ class Workflow(Process, base.Workflow):
         for o in self.obj.get('outputs', []):
             for pos, src in enumerate(as_list(o.get('source'))):
                 src_step_id = src.split('.')[0] if '.' in src else None
-                self.links.append(DataLink(src, o['id'], src_step_id, None, pos))
+                self.links.append(DataLink(src, o['id'], src_step_id, pos=pos))
 
     def successors(self, step_id):
         input_ids = {l.dst for l in self.links if l.src_step_id == step_id}
