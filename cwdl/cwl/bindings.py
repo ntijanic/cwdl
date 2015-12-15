@@ -65,15 +65,20 @@ class Workflow(Process, base.Workflow):
                 self.links.append(DataLink(src, o['id'], src_step_id, pos=pos))
 
     def successors(self, step_id):
-        input_ids = {l.dst for l in self.links if l.src_step_id == step_id}
-        return [s for s in self.steps.itervalues() if set(s.inputs) & input_ids]
+        ids = {l.dst_step_id for l in self.links if l.src_step_id == step_id}
+        return [s for s in self.steps.itervalues() if s.id in ids]
 
     def predecessors(self, step_id):
-        output_ids = {l.src for l in self.links if l.dst_step_id == step_id}
-        return [s for s in self.steps.itervalues() if set(s.outputs) & output_ids]
-
-    def incoming_links(self, port_id):
-        return [l for l in self.links if l.dst == port_id]
+        ids = {l.src_step_id for l in self.links if l.dst_step_id == step_id}
+        return [s for s in self.steps.itervalues() if s.id in ids]
 
     def dependencies(self, port_id):
-        return [l for l in self.links if l.dst == port_id]
+        return [l.src for l in self.links if l.dst == port_id]
+
+    def value_for_port(self, port_id, deps):
+        links = sorted([l for l in self.links if l.dst == port_id], key=lambda x: x.pos)
+        if not links:
+            return None  # TODO: Return default
+        ids = [l.src for l in links]
+        val = [deps[k] for k in ids]
+        return val if len(val) > 1 else val[0]

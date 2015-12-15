@@ -7,7 +7,8 @@ from cwdl.wdl.runner import wdl_run
 
 wdl_code = """
 task my_task {
-  File input
+  File file
+
   command {
     cat ${file} > output.txt
   }
@@ -17,10 +18,10 @@ task my_task {
 }
 
 workflow my_wf {
-  File file
+  File inp
 
   call my_task {
-    input: file=input
+    input: file=inp
   }
 }
 """
@@ -30,7 +31,7 @@ def test():
     wdl_namespace = wdl.loads(wdl_code)
     wf = wdl_namespace.workflows[0]
     engine = Engine(wdl_run)
-    engine.submit(Workflow(wf), {'input': 'README.md'}, 'test')
+    engine.submit(Workflow(wf), {'inp': 'README.md'}, 'test')
     engine.run_all()
     assert engine.get('test').state == Job.FINISHED
     assert engine.jobs.vars['test.my_task.output'].endswith('output.txt')

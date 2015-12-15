@@ -24,7 +24,10 @@ class Workflow(object):
     def predecessors(self, step_id):
         pass
 
-    def incoming_links(self, port_id):
+    def dependencies(self, port_id):
+        pass
+
+    def value_for_port(self, port_id, deps):
         pass
 
 

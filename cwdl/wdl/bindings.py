@@ -11,7 +11,7 @@ class Step(object):
 
 
 class DataLink(object):
-    def __init__(self, src, dst, src_step_id=None, dst_step_id=None, pos=0):
+    def __init__(self, src, dst, src_step_id=None, dst_step_id=None):
         self.__dict__.update(locals())
 
 
@@ -35,18 +35,21 @@ class Workflow(object):
             outputs = {join('.', call.name, k): v for k, v in proc.outputs}
             self.steps[call.name] = Step(call.name, inputs, outputs, proc)
             for k, v in inputs.iteritems():
-                src = v.ast.source_string  # Simplest case only.
+                src = v.ast.source_string  # Simplest case. TODO: Extract variables from ast?
                 src_step = src.split('.')[0] if '.' in src else None
                 link = DataLink(src, k, src_step, call.name)
                 self.links.append(link)
 
     def successors(self, step_id):
-        input_ids = {l.dst for l in self.links if l.src_step_id == step_id}
-        return [s for s in self.steps.itervalues() if set(s.inputs) & input_ids]
+        ids = {l.dst_step_id for l in self.links if l.src_step_id == step_id}
+        return [s for s in self.steps.itervalues() if s.id in ids]
 
     def predecessors(self, step_id):
-        output_ids = {l.src for l in self.links if l.dst_step_id == step_id}
-        return [s for s in self.steps.itervalues() if set(s.outputs) & output_ids]
+        ids = {l.src_step_id for l in self.links if l.dst_step_id == step_id}
+        return [s for s in self.steps.itervalues() if s.id in ids]
 
-    def incoming_links(self, port_id):
-        return [l for l in self.links if l.dst == port_id]
+    def dependencies(self, port_id):
+        return [l.src for l in self.links if l.dst == port_id]
+
+    def value_for_port(self, port_id, deps):
+        return deps.values()[0]  # Simplest case. TODO: Evaluate expression?

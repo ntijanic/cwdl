@@ -82,12 +82,9 @@ class Engine(object):
                 self.job_ready(step_job)
 
     def value_for_port(self, wf_job, port_id):
-        links = sorted(wf_job.process.incoming_links(port_id), key=lambda x: x.pos)
-        if not links:
-            return wf_job.process.inputs.get(port_id)
-        ids = [join_id(wf_job.id, l.src) for l in links]
-        val = [self.jobs.vars[k] for k in ids]
-        return val if len(val) > 1 else val[0]
+        workflow = wf_job.process
+        deps = {k: self.jobs.vars[join_id(wf_job.id, k)] for k in workflow.dependencies(port_id)}
+        return workflow.value_for_port(port_id, deps)
 
     def job_ready(self, job):
         self.jobs.set_state(job.id, Job.READY)
