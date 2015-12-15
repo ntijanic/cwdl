@@ -1,21 +1,22 @@
 import os
-import yaml
-from cwdl.cwl.bindings import Workflow
+from cwdl.cwl.parser import load
 from cwdl.engine import Engine
 
 
+def load_cwl(name):
+    return load(os.path.join(os.path.dirname(__file__), '..', 'cwltools', name))
+
+
 def test_cwl_wf():
-    with open(os.path.join(os.path.dirname(__file__), '..', 'test.cwl.yaml')) as fp:
-        wf = Workflow(yaml.load(fp))
+    wf = load_cwl('test.cwl.yaml')
     engine = Engine()
     inputs = {
-        'winp1': 1,
-        'winp2': 2,
+        'input': {'class': 'File', 'path': 'README.md'},
     }
     job = engine.submit(wf, inputs)
     engine.run_all()
     job = engine.get(job.id)
-    assert job.outputs == {'wout1': 'out', 'wout2': ['out', 'out']}
+    assert job.outputs['output']['path'].endswith('output.txt')
 
 
 if __name__ == '__main__':

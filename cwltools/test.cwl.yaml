@@ -1,0 +1,14 @@
+class: Workflow
+inputs:
+  - id: input
+outputs:
+  - id: output
+    source: step1.output
+steps:
+  - id: step1
+    inputs:
+      - id: step1.input
+        source: input
+    outputs:
+      - id: step1.output
+    run: {import: cat.cwl.yaml}

@@ -1,21 +1,10 @@
-from collections import defaultdict
-
 from cwdl.bindings import Job
 
 
 class JobStore(object):
     def __init__(self):
         self.jobs = {}
-        self.vars = defaultdict(dict)
-
-    def set_var(self, job_id, key, val):
-        self.vars[job_id][key] = val
-
-    def get_var(self, job_id, key):
-        return self.vars[job_id][key]
-
-    def update_job_vars(self, job_id, variables):
-        self.vars[job_id].update(variables)
+        self.vars = {}
 
     def add_or_update(self, job):
         self.jobs[job.id] = job
@@ -25,7 +14,9 @@ class JobStore(object):
 
     def get_for_step(self, wf_job_id, step_id):
         result = [job for job in self.jobs.itervalues() if job.parent_id == wf_job_id and job.step_id == step_id]
-        return result[0] if result else None
+        if not result:
+            raise Exception('Job not found for step %s of %s' % (step_id, wf_job_id))
+        return result[0]
 
     def all_done(self):
         return not [j for j in self.jobs.itervalues() if j.state in Job.NON_TERMINATED]
