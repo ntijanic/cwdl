@@ -29,7 +29,6 @@ class CLITool(Process):
 class Workflow(Process):
     def __init__(self):
         super(Workflow, self).__init__()
-        self.ports = {}
         self.steps = {}
         
     def successors(self, step_id):

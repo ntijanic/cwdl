@@ -1,1 +1,0 @@
-{"inputs": [{"inputBinding": {"position": 0}, "type": "File", "id": "input"}], "stdout": "output.txt", "class": "CommandLineTool", "outputs": [{"outputBinding": {"glob": "output.txt"}, "type": "File", "id": "output"}], "baseCommand": "cat"}

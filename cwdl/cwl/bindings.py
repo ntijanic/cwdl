@@ -9,14 +9,6 @@ def as_list(val):
     return [val]
 
 
-def id_for(obj_or_list):
-    if isinstance(obj_or_list, basestring):
-        return obj_or_list
-    if isinstance(obj_or_list, list):
-        return [id_for(i) for i in obj_or_list]
-    return obj_or_list.id
-
-
 def new_process(obj):
     cls = obj.get('class')
     if cls == 'Workflow':

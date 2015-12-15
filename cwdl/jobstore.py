@@ -1,6 +1,3 @@
-from cwdl.bindings import Job
-
-
 class JobStore(object):
     def __init__(self):
         self.jobs = {}
@@ -20,9 +17,6 @@ class JobStore(object):
         if not result:
             raise Exception('Job not found for step %s of %s' % (step_id, wf_job_id))
         return result[0]
-
-    def all_done(self):
-        return not [j for j in self.jobs.itervalues() if j.state in Job.NON_TERMINATED]
 
     def get_by_state(self, state):
         return [j for j in self.jobs.itervalues() if j.state == state]
