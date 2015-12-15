@@ -5,7 +5,7 @@ from cwdl.bindings import Job
 
 
 def load_cwl(name):
-    return load(os.path.join(os.path.dirname(__file__), '..', 'cwltools', name))
+    return load(os.path.join(os.path.dirname(__file__), '../../cwltools', name))
 
 
 def test_cwl_wf():

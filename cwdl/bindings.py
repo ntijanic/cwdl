@@ -1,9 +1,3 @@
-class Process(object):
-    def __init__(self):
-        self.inputs = {}
-        self.outputs = {}
-
-
 class Step(object):
     def __init__(self):
         self.inputs = {}
@@ -14,31 +8,24 @@ class MapStep(Step):
     pass
 
 
-class DataLink(object):
-    def __init__(self):
-        self.src = ''
-        self.dst = ''
-        self.src_port_id = None
-        self.dst_port_id = None
-
-
-class CLITool(Process):
+class CLITool(object):
     pass
 
 
-class Workflow(Process):
+class Workflow(object):
     def __init__(self):
-        super(Workflow, self).__init__()
+        self.inputs = {}
+        self.outputs = {}
         self.steps = {}
         
     def successors(self, step_id):
-        return []
+        pass
 
     def predecessors(self, step_id):
-        return []
+        pass
 
     def incoming_links(self, port_id):
-        return []
+        pass
 
 
 class Job(object):

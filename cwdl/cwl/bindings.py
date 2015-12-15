@@ -1,4 +1,4 @@
-from cwdl import bindings as base
+import cwdl.bindings as base
 
 
 def as_list(val):
@@ -18,14 +18,14 @@ def new_process(obj):
     raise NotImplementedError('Process type %s unknown' % cls)
 
 
-class Process(base.Process):
+class Process(object):
     def __init__(self, obj):
         self.obj = obj
         self.inputs = {i['id']: None for i in obj.get('inputs', [])}
         self.outputs = {o['id']: None for o in obj.get('outputs', [])}
 
 
-class Step(base.Step):
+class Step(object):
     def __init__(self, step_id, inputs, outputs, process):
         self.id = step_id
         self.inputs = inputs
@@ -33,17 +33,9 @@ class Step(base.Step):
         self.process = process
 
 
-class MapStep(Step, base.MapStep):
-    pass
-
-
-class DataLink(base.DataLink):
+class DataLink(object):
     def __init__(self, src, dst, src_step_id=None, dst_step_id=None, pos=0):
-        self.src = src
-        self.dst = dst
-        self.src_step_id = src_step_id
-        self.dst_step_id = dst_step_id
-        self.pos = pos
+        self.__dict__.update(locals())
 
 
 class CLITool(Process, base.CLITool):
@@ -59,8 +51,7 @@ class Workflow(Process, base.Workflow):
         for s in obj.get('steps', []):
             inputs = {i['id']: i.get('default') for i in s.get('inputs', [])}
             outputs = {o['id']: None for o in s.get('outputs', [])}
-            step_cls = MapStep if s.get('scatter') else Step
-            step = step_cls(s['id'], inputs, outputs, new_process(s['run']))
+            step = Step(s['id'], inputs, outputs, new_process(s['run']))
             self.steps[step.id] = step
         # Create DataLinks
         for s in self.obj.get('steps', []):
@@ -82,4 +73,7 @@ class Workflow(Process, base.Workflow):
         return [s for s in self.steps.itervalues() if set(s.outputs) & output_ids]
 
     def incoming_links(self, port_id):
+        return [l for l in self.links if l.dst == port_id]
+
+    def dependencies(self, port_id):
         return [l for l in self.links if l.dst == port_id]
